@@ -1,4 +1,6 @@
 #include "app.hpp"
+#include "icecream.hpp"
+#include "random_pi.hpp"
 #include <vector>
 
 class MyApp : public App
@@ -15,9 +17,10 @@ class MyApp : public App
     virtual void Update() final
     {
         // Get framerate
+        random_pi.AddSample();
 
-        // Calculate next values and store in vector
-
+        pi_estimate.push_back(random_pi.GetResult());
+        samples.push_back(random_pi.GetSamples());
         // Render vector graph
 
         ImGui::Begin("Random PI!");
@@ -30,8 +33,9 @@ class MyApp : public App
     }
 
     private:
-    std::vector<int> samples;
-    std::vector<int> pi_estimate;
+    RandomPi random_pi;
+    std::vector<float> samples;
+    std::vector<float> pi_estimate;
 
 };
 
