@@ -1,0 +1,11 @@
+[constants]
+
+[built-in options]
+c_std = 'c99'
+cpp_std = 'c++17'
+optimization = '2'
+
+[binaries]
+c = '/usr/bin/clang'
+cpp = '/usr/bin/clang++'
+
