@@ -1,3 +1,12 @@
 {
-    "C_Cpp.errorSquiggles": "Disabled"
+    // Sets the font family
+    "editor.fontFamily": "'source code pro'",
+    // Sets the line height
+    "editor.lineHeight": 18,
+
+    // Enables differently colored brackets
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs":"active",
+
+    "C_Cpp.errorSquiggles": "Disabled",
 }
