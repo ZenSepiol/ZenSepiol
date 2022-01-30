@@ -6,7 +6,7 @@
 
     // Enables differently colored brackets
     "editor.bracketPairColorization.enabled": true,
-    "editor.guides.bracketPairs": "active",
+    "editor.guides.bracketPairs":"active",
 
-    // "C_Cpp.errorSquiggles": "Disabled",
+    "C_Cpp.errorSquiggles": "Disabled",
 }
