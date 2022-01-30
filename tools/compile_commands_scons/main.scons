@@ -1,0 +1,12 @@
+import scons_compiledb
+
+env = Environment(
+    CPPPATH=['./dependency'],
+    CPPDEFINES=['foo'],
+    SCONS_CXX_STANDARD='c++11')
+
+scons_compiledb.enable(env)
+
+app = env.Program('my_program', ['main.cpp', 'dependency/line.cpp'])
+
+env.CompileDb()
