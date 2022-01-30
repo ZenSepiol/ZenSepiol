@@ -1,10 +1,2 @@
-env = Environment(
-    CPPPATH='/usr/include/boost/',
-    CPPDEFINES=['foo'],
-    SCONS_CXX_STANDARD='c++11')
-
-app = env.Program('my_program', Glob('./*.cpp'))
-
-for item in app:
-    for child in item.all_children():
-        print(child)
+AddOption('--build', default='build')
+SConscript("main.scons", variant_dir=GetOption('build'), duplicate=0)
