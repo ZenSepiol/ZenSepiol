@@ -13,4 +13,6 @@ class ConnectFourPlayer
     virtual int Move(ConnectFourGame& game) = 0;
 
     void Play(ConnectFourGame& game);
+
+    bool debug_output = false;
 };

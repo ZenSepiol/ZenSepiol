@@ -23,7 +23,7 @@ TEST_CASE("Get Player", "[single-file]")
     ConnectFourGame connect_four_game;
 
     // clang-format off
-  ConnectFourGame::GameState state = 
+    ConnectFourGame::GameState state = 
     {{
     {{Player::none, Player::none, Player::none, Player::red, Player::blue, Player::none, Player::none}},
     {{Player::none, Player::none, Player::none, Player::red, Player::none, Player::none, Player::none}},
@@ -41,43 +41,7 @@ TEST_CASE("Get Player", "[single-file]")
     REQUIRE(connect_four_game.GetPlayer(0, 2) == Player::none);
     REQUIRE(connect_four_game.GetPlayer(0, 3) == Player::red);
     REQUIRE(connect_four_game.GetPlayer(0, 4) == Player::blue);
-    REQUIRE(connect_four_game.GetPlayer(0, 5) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(0, 6) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(1, 0) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(1, 1) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(1, 2) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(1, 3) == Player::red);
-    REQUIRE(connect_four_game.GetPlayer(1, 4) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(1, 5) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(1, 6) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(2, 0) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(2, 1) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(2, 2) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(2, 3) == Player::red);
-    REQUIRE(connect_four_game.GetPlayer(2, 4) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(2, 5) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(2, 6) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(3, 0) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(3, 1) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(3, 2) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(3, 3) == Player::red);
-    REQUIRE(connect_four_game.GetPlayer(3, 4) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(3, 5) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(3, 6) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(4, 0) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(4, 1) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(4, 2) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(4, 3) == Player::red);
-    REQUIRE(connect_four_game.GetPlayer(4, 4) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(4, 5) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(4, 6) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(5, 0) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(5, 1) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(5, 2) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(5, 3) == Player::red);
-    REQUIRE(connect_four_game.GetPlayer(5, 4) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(5, 5) == Player::none);
-    REQUIRE(connect_four_game.GetPlayer(5, 6) == Player::none);
+
 }
 
 TEST_CASE("Top Row returns the first empty row", "[single-file]")

@@ -10,7 +10,8 @@ files = files(
     'connect_four_main/connect_four_main.cpp',
     'connect_four_player/connect_four_player.cpp',
     'connect_four_player/connect_four_player_random.cpp',
-    'connect_four_player/connect_four_player_stdin.cpp'
+    'connect_four_player/connect_four_player_stdin.cpp',
+    'connect_four_player/connect_four_player_q.cpp'
 )
 
 executable('connect_four', files, include_directories : incdir, dependencies : [] )

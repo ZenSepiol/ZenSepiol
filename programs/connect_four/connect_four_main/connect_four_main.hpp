@@ -10,7 +10,14 @@ class ConnectFourMain
     void Run();
 
   private:
-    ConnectFourGame connect_four;
     ConnectFourPlayer* player_red;
     ConnectFourPlayer* player_blue;
+
+    int number_of_games = 1000000;
+
+    int red_won = 0;
+    int blue_won = 0;
+    int draw = 0;
+
+    bool output = true;
 };

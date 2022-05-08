@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <iostream>
 
-
 ConnectFourGame::ConnectFourGame()
 {
     game_state = GameState();
@@ -226,13 +225,16 @@ Player ConnectFourGame::EvaluateForAntidiagonal(Player player, int row, int colu
 
 void ConnectFourGame::Move(int column)
 {
-    auto row = GetTopRow(column);
-    if (row > 6)
+    if (!game_over)
     {
-        return;
-    }
+        auto row = GetTopRow(column);
+        if (row > 6)
+        {
+            return;
+        }
 
-    game_state[row - 1][column] = current_player;
+        game_state[row - 1][column] = current_player;
+    }
 
     if (current_player == Player::red)
     {
@@ -243,7 +245,10 @@ void ConnectFourGame::Move(int column)
         current_player = Player::red;
     }
 
-    winner = EvaluateMove(column);
+    if (!game_over)
+    {
+        winner = EvaluateMove(column);
+    }
 
     if (CalculatePossibleMoves().empty() || winner != Player::none)
     {
@@ -263,15 +268,15 @@ Player ConnectFourGame::GetWinner()
 
 std::set<int> ConnectFourGame::CalculatePossibleMoves()
 {
-  std::set<int> all_moves = {0, 1, 2, 3, 4, 5, 6};
-  std::set<int> possible_moves = {};
-  
-  for (auto& move : all_moves)
-  {
-    if (GetTopRow(move) > 0)
+    std::set<int> all_moves = {0, 1, 2, 3, 4, 5, 6};
+    std::set<int> possible_moves = {};
+
+    for (auto& move : all_moves)
     {
-      possible_moves.emplace(move);
+        if (GetTopRow(move) > 0)
+        {
+            possible_moves.emplace(move);
+        }
     }
-  }
-  return possible_moves;
+    return possible_moves;
 }

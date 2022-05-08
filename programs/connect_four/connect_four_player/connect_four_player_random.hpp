@@ -17,5 +17,4 @@ class ConnectFourPlayerRandom : public ConnectFourPlayer
 
   private:
     std::mt19937 mt = std::mt19937(std::chrono::high_resolution_clock::now().time_since_epoch().count());
-    std::uniform_int_distribution<> rand_column{0, 6};
 };
