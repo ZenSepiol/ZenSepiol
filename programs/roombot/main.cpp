@@ -30,7 +30,13 @@ class Map
 class MyApp : public App
 {
   public:
-    MyApp() = default;
+    MyApp()
+    {
+        static ImVec4 custom_color[2] = {ImVec4(23.f / 255.f, 123.f / 255.f, 166.f / 255.f, 1.f),
+                                         ImVec4(1.0, 1.0, 0.8, 1.0)};
+        auto index = ImPlot::AddColormap("Zen Sepiol", custom_color, 2);
+        ImPlot::GetStyle().Colormap = index;
+    };
     ~MyApp() = default;
 
     virtual void StartUp() final
@@ -42,32 +48,28 @@ class MyApp : public App
         if (gui_state == GuiState::learning)
         {
             float total_reward = 0.0;
-            float clean_tiles = 0.0;
+            int clean_tiles = 0;
+            int moves_made = 0;
 
-            for (int i = 0; i < number_of_epsiodes; ++i)
+            for (int i = 0; i < episodes_per_epoch; ++i)
             {
                 q_learning.Reset();
-                while (q_learning.number_of_system_updates < moves)
+                while ((q_learning.GetState().GetNumberTiles(TileState::dirty) != 0) && (q_learning.number_of_system_updates < moves))
                 {
                     q_learning.Update();
                     total_reward += q_learning.last_reward;
                 }
+                q_learning.Update();
+                total_reward += q_learning.last_reward;
 
-                auto tiles = q_learning.GetState().tiles;
-                for (auto& row : tiles)
-                {
-                    for (auto& tile : row)
-                    {
-                        if (tile == TileState::clean)
-                        {
-                            clean_tiles++;
-                        }
-                    }
-                }
+                clean_tiles += q_learning.GetState().GetNumberTiles(TileState::clean);
+                moves_made += q_learning.number_of_system_updates;
             }
-
-            total_reward_per_epsiode.push_back(total_reward / static_cast<float>(number_of_epsiodes));
-            clean_tiles_average.push_back(clean_tiles / static_cast<float>(number_of_epsiodes));
+            
+            explore_rate.push_back(q_learning.explore_rate);
+            total_reward_per_epoch.push_back(total_reward / static_cast<float>(episodes_per_epoch));
+            clean_tiles_average.push_back(clean_tiles / static_cast<float>(episodes_per_epoch));
+            moves_made_average.push_back(moves_made / static_cast<float>(episodes_per_epoch));
 
             q_learning.Reset();
             q_learning.print = true;
@@ -75,25 +77,33 @@ class MyApp : public App
         }
         else if (gui_state == GuiState::show_run)
         {
-            if (q_learning.number_of_system_updates < moves)
+            float time_for_frame = ImGui::GetIO().DeltaTime;
+            time_for_frame_acc += time_for_frame;
+
+            if (time_for_frame_acc >= time_for_frame_des)
             {
-                q_learning.Update();
-            }
-            else
-            {
-                gui_state = GuiState::learning;
-                q_learning.print = false;
+                time_for_frame_acc = 0.f;
+                if ((q_learning.GetState().GetNumberTiles(TileState::dirty) != 0) && (q_learning.number_of_system_updates < moves))
+                {
+                    q_learning.Update();
+                }
+                else
+                {
+                    gui_state = GuiState::learning;
+                    q_learning.print = false;
+                }
             }
         }
 
         if (ImGui::Begin("Room Bot Statistics"))
         {
-            if (ImPlot::BeginSubplots("My Subplot", 2, 1, ImVec2(1600, 400)))
+            if (ImPlot::BeginSubplots("", 4, 1, ImVec2(1200, 800)))
             {
-                if (ImPlot::BeginPlot("Average Clean Tiles"))
+                if (ImPlot::BeginPlot(""))
                 {
-                    ImPlot::SetupAxis(ImAxis_X1, "Average Clean Tiles", ImPlotAxisFlags_AutoFit);
-                    ImPlot::SetupAxis(ImAxis_Y1, "Number of Episodes", ImPlotAxisFlags_AutoFit);
+                    ImPlot::SetupAxis(ImAxis_X1, "Number of Epochs", ImPlotAxisFlags_AutoFit);
+                    ImPlot::SetupAxis(ImAxis_Y1, "Average Clean Tiles");
+                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 28);
 
                     std::vector<float> local_samples(clean_tiles_average.size());
                     std::generate(local_samples.begin(), local_samples.end(), [n = 0]() mutable { return 1.0 * n++; });
@@ -101,15 +111,27 @@ class MyApp : public App
                                      clean_tiles_average.size());
                     ImPlot::EndPlot();
                 }
-                if (ImPlot::BeginPlot("Total Reward"))
+                if (ImPlot::BeginPlot(""))
                 {
-                    ImPlot::SetupAxis(ImAxis_X1, "Total Reward", ImPlotAxisFlags_AutoFit);
-                    ImPlot::SetupAxis(ImAxis_Y1, "Number of Episodes", ImPlotAxisFlags_AutoFit);
+                    ImPlot::SetupAxis(ImAxis_X1, "Number of Epochs", ImPlotAxisFlags_AutoFit);
+                    ImPlot::SetupAxis(ImAxis_Y1, "Average Moves Made");
+                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 101);
 
-                    std::vector<float> local_samples(total_reward_per_epsiode.size());
+                    std::vector<float> local_samples(moves_made_average.size());
                     std::generate(local_samples.begin(), local_samples.end(), [n = 0]() mutable { return 1.0 * n++; });
-                    ImPlot::PlotLine("Total Episode Reward", local_samples.data(), total_reward_per_epsiode.data(),
-                                     total_reward_per_epsiode.size());
+                    ImPlot::PlotLine("Average moves made", local_samples.data(), moves_made_average.data(),
+                                     moves_made_average.size());
+                    ImPlot::EndPlot();
+                }
+                if (ImPlot::BeginPlot(""))
+                {
+                    ImPlot::SetupAxis(ImAxis_X1, "Number of Epochs", ImPlotAxisFlags_AutoFit);
+                    ImPlot::SetupAxis(ImAxis_Y1, "Explore Rate");
+                    ImPlot::SetupAxisLimits(ImAxis_Y1, 0, 1.01);
+
+                    std::vector<float> local_samples(explore_rate.size());
+                    std::generate(local_samples.begin(), local_samples.end(), [n = 0]() mutable { return 1.0 * n++; });
+                    ImPlot::PlotLine("Explore Rate", local_samples.data(), explore_rate.data(), explore_rate.size());
                     ImPlot::EndPlot();
                 }
                 ImPlot::EndSubplots();
@@ -119,21 +141,68 @@ class MyApp : public App
 
         if (ImGui::Begin("Room Bot Run"))
         {
-            ImDrawList* draw_list = ImGui::GetWindowDrawList();
+            RoomBotState<Map> state = q_learning.GetState();
+
+            int tile_size = 60;
+            int gap = 1;
+            int begin = 50;
+            for (int row = 0; row < Map::size_y; ++row)
+            {
+                for (int col = 0; col < Map::size_x; ++col)
+                {
+                    ImVec4 color;
+                    if (Map::map[col][row])
+                    {
+                        if (state.tiles[col][row] == TileState::clean)
+                        {
+                            color = ImVec4(0.18, 0.67, 0.17, 1.0f);
+                        }
+                        else
+                        {
+                            color = ImVec4(0.74, 0.13, 0.08, 1.0f);
+                        }
+                    }
+                    else
+                    {
+                        color = ImVec4(0.11, 0.11, 0.13, 0.5f);
+                    }
+                    RectangleRelative(ImVec2(begin + tile_size * row, begin + tile_size * col),
+                                      ImVec2(tile_size - gap, tile_size - gap), color);
+                }
+            }
+            ImVec4 color = ImVec4(0.99, 0.88, 0.69, 0.5f);
+            RectangleRelative(
+                ImVec2(begin + tile_size * state.bot_position_y, begin + tile_size * state.bot_position_x),
+                ImVec2(tile_size - gap, tile_size - gap), color);
         }
         ImGui::End();
     };
 
   private:
+    void RectangleRelative(const ImVec2& position_relative, const ImVec2 size, const ImVec4& color)
+    {
+        const ImU32 color_int = ImColor(color);
+        ImDrawList* draw_list = ImGui::GetWindowDrawList();
+        const auto pos = ImGui::GetWindowPos();
+        const auto abs_pos = ImVec2(pos.x + position_relative.x, pos.y + position_relative.y);
+
+        draw_list->AddRectFilled(abs_pos, ImVec2(abs_pos.x + size.x, abs_pos.y + size.y), color_int);
+    }
+
     QLearning<RoomBot<Map>> q_learning{RoomBot<Map>()};
 
-    GuiState gui_state = GuiState::learning;
+    GuiState gui_state = GuiState::show_run;
 
-    int moves = 29;
-    int number_of_epsiodes = 100;
+    int moves = 100;
+    int episodes_per_epoch = 20000;
 
-    std::vector<float> total_reward_per_epsiode;
+    std::vector<float> total_reward_per_epoch;
     std::vector<float> clean_tiles_average;
+    std::vector<float> explore_rate;
+    std::vector<float> moves_made_average;
+
+    float time_for_frame_acc = 0.f;
+    float time_for_frame_des = 0.1f;
 };
 
 int main(int, char**)

@@ -61,7 +61,7 @@ class App
 #endif
 
         // Create window with graphics context
-        GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+        // GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         window = glfwCreateWindow(1280, 720, "Zen Sepiol Default App", nullptr, nullptr);
         glfwSetWindowSize(window, 1920, 1080);
 
@@ -176,7 +176,7 @@ class App
         // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double
         // backslash \\ !
         // io.Fonts->AddFontDefault();
-        // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
+        io.Fonts->AddFontFromFileTTF("../../../imgui/misc/fonts/Roboto-Medium.ttf", 18.0f);
         // io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
         // io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
         // io.Fonts->AddFontFromFileTTF("../../misc/fonts/ProggyTiny.ttf", 10.0f);

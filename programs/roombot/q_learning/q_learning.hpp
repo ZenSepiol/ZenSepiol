@@ -18,6 +18,13 @@ class QLearning
     {
     }
 
+    void Reset()
+    {
+        number_of_system_updates = 0;
+        number_of_controller_updates = 0;
+        system.Reset();
+    }
+
     void Update()
     {
         Act(system.state);
@@ -28,6 +35,9 @@ class QLearning
             passed_time += time_step;
             number_of_system_updates++;
         }
+
+        Learn(system.state);
+
         if (print)
         {
             std::cout << std::endl;
@@ -36,15 +46,7 @@ class QLearning
         }
     }
 
-    void Reset()
-    {
-        number_of_system_updates = 0;
-        number_of_controller_updates = 0;
-        first_action = true;
-        system.Reset();
-    }
-
-    void Act(const State& state)
+    void CheckForNewState(const State& state)
     {
         if (Q.find(state) == Q.end())
         {
@@ -55,6 +57,36 @@ class QLearning
                 Q[state].insert(action);
             }
         }
+    }
+
+    void Act(const State& state)
+    {
+        CheckForNewState(state);
+
+        // Choose action according to epsilon-greedy policy
+        if (rand_percent(mt) < static_cast<int>(explore_rate * 100.f))
+        {
+            auto& actions = Q[state];
+            std::vector<Action> out;
+            std::sample(actions.begin(), actions.end(), std::back_inserter(out), 1, mt);
+            previous_action = out.back();
+        }
+        else
+        {
+            auto& actions = Q[state];
+            previous_action = *actions.begin();
+            for (const auto& action : actions)
+            {
+                if (action.q_value > previous_action.q_value)
+                {
+                    previous_action = action;
+                }
+            }
+        }
+
+        previous_state = state;
+        explore_rate *= explore_rate_decay;
+        number_of_controller_updates++;
 
         if (print)
         {
@@ -66,72 +98,30 @@ class QLearning
             }
             IC(explore_rate);
         }
+    };
 
-        auto& actions = Q[state];
-        if (!actions.empty())
+    void Learn(const State& new_state)
+    {
+        CheckForNewState(new_state);
+
+        // Update Q Matrix for the last action
+        float reward = new_state.GetReward(previous_state) * time_step;
+        last_reward = reward;
+        if (print)
         {
-            if (is_learning)
-            {
-                // Update Q Matrix for the last action
-                if (!first_action)
-                {
-                    float reward = state.GetReward(previous_state) * time_step;
-                    last_reward = reward;
-                    if (print)
-                    {
-                        IC(reward);
-                    }
-
-                    float max_q_value = actions.begin()->q_value;
-                    for (auto& action : actions)
-                    {
-                        max_q_value = std::max(max_q_value, action.q_value);
-                    }
-
-                    float delta = learning_rate * (reward + discount_rate * max_q_value - previous_action.q_value);
-                    Q[previous_state].find(previous_action)->q_value += delta;
-                }
-                else
-                {
-                    first_action = false;
-                }
-
-                // Choose action according to epsilon-greedy policy
-                if (rand_percent(mt) < static_cast<int>(explore_rate * 100.f))
-                {
-                    std::vector<Action> out;
-                    std::sample(actions.begin(), actions.end(), std::back_inserter(out), 1, mt);
-                    previous_action = out.back();
-                }
-                else
-                {
-                    previous_action = *actions.begin();
-                    for (const auto& action : actions)
-                    {
-                        if (action.q_value > previous_action.q_value)
-                        {
-                            previous_action = action;
-                        }
-                    }
-                }
-            }
-            // Not learning: Exploit the current Q Matrix and choose the action with highest Q-Value
-            else
-            {
-                for (const auto& action : actions)
-                {
-                    if (action.q_value > previous_action.q_value)
-                    {
-                        previous_action = action;
-                    }
-                }
-            }
+            IC(reward);
         }
 
-        previous_state = state;
-        explore_rate *= explore_rate_decay;
-        number_of_controller_updates++;
-    };
+        auto& actions = Q[new_state];
+        float max_q_value = actions.begin()->q_value;
+        for (auto& action : actions)
+        {
+            max_q_value = std::max(max_q_value, action.q_value);
+        }
+
+        float delta = learning_rate * (reward + discount_rate * max_q_value - previous_action.q_value);
+        Q[previous_state].find(previous_action)->q_value += delta;
+    }
 
     typename System::State GetState()
     {
@@ -145,7 +135,7 @@ class QLearning
     int number_of_system_updates = 0;
 
     double explore_rate = 1.0;
-    double explore_rate_decay = 0.999999;
+    double explore_rate_decay = 0.99999999;
     bool print = false;
 
   private:
@@ -155,9 +145,7 @@ class QLearning
     const int controller_system_update_ratio = 1;
 
     float learning_rate = 0.9;
-    float discount_rate = 0.9;
-
-    bool is_learning = true;
+    float discount_rate = 0.999;
 
     std::unordered_map<State, std::unordered_set<Action>> Q;
 
@@ -165,6 +153,4 @@ class QLearning
     std::uniform_int_distribution<> rand_percent{0, 99};
 
     State previous_state;
-
-    bool first_action = true;
 };

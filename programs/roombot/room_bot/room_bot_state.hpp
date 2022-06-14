@@ -10,9 +10,25 @@ enum class TileState
     clean
 };
 
+// Example Map
+// class Map
+// {
+//   public:
+//     static const int size_x = 2;
+//     static const int size_y = 2;
+
+//     static constexpr std::array<std::array<bool, size_x>, size_y> map = {{{{true, false}},
+//                                                                           {{true, true}}}};
+// };
+
 template <typename Map>
 struct RoomBotState
 {
+    unsigned bot_position_x = 0;
+    unsigned bot_position_y = 0;
+
+    std::array<std::array<TileState, Map::size_y>, Map::size_x> tiles;
+
     RoomBotState()
     {
         for (int row = 0; row < Map::size_x; ++row)
@@ -25,14 +41,14 @@ struct RoomBotState
         tiles[0][0] = TileState::clean;
     }
 
-    friend bool operator==(const RoomBotState& e1, const RoomBotState& e2)
+    friend bool operator==(const RoomBotState& lhs, const RoomBotState& rhs)
     {
         bool tiles_equal = true;
         for (int row = 0; row < Map::size_x; ++row)
         {
             for (int col = 0; col < Map::size_y; ++col)
             {
-                if (e1.tiles[col][row] != e2.tiles[col][row])
+                if (lhs.tiles[col][row] != rhs.tiles[col][row])
                 {
                     tiles_equal = false;
                 }
@@ -40,7 +56,7 @@ struct RoomBotState
         }
 
         bool equal =
-            tiles_equal && (e1.bot_position_x == e2.bot_position_x) && (e1.bot_position_y == e2.bot_position_y);
+            tiles_equal && (lhs.bot_position_x == rhs.bot_position_x) && (lhs.bot_position_y == rhs.bot_position_y);
         return equal;
     };
 
@@ -90,7 +106,7 @@ struct RoomBotState
 
     float GetReward(const RoomBotState<Map>& previous_state) const
     {
-        float reward = 0.0;
+        float reward = -0.1;
         for (int row = 0; row < Map::size_x; ++row)
         {
             for (int col = 0; col < Map::size_y; ++col)
@@ -103,6 +119,22 @@ struct RoomBotState
         }
 
         return reward;
+    }
+
+    int GetNumberTiles(TileState tile_state) const
+    {
+        int result = 0;
+        for (int row = 0; row < Map::size_x; ++row)
+        {
+            for (int col = 0; col < Map::size_y; ++col)
+            {
+                if (tiles[col][row] == tile_state && Map::map[col][row])
+                {
+                    result++;
+                }
+            }
+        }
+        return result;
     }
 
     void print() const
@@ -120,12 +152,8 @@ struct RoomBotState
         }
         std::cout << std::endl;
     }
-
-    unsigned bot_position_x = 0;
-    unsigned bot_position_y = 0;
-
-    std::array<std::array<TileState, Map::size_y>, Map::size_x> tiles;
 };
+
 
 template <typename Map>
 struct std::hash<RoomBotState<Map>>
