@@ -51,7 +51,7 @@ class MyApp : public App
             int clean_tiles = 0;
             int moves_made = 0;
 
-            for (int i = 0; i < episodes_per_epoch; ++i)
+            for (int i = 0; i < episodes_per_epoch * initial_train; ++i)
             {
                 q_learning.Reset();
                 while ((q_learning.GetState().GetNumberTiles(TileState::dirty) != 0) && (q_learning.number_of_system_updates < moves))
@@ -65,6 +65,7 @@ class MyApp : public App
                 clean_tiles += q_learning.GetState().GetNumberTiles(TileState::clean);
                 moves_made += q_learning.number_of_system_updates;
             }
+            initial_train = 1;
             
             explore_rate.push_back(q_learning.explore_rate);
             total_reward_per_epoch.push_back(total_reward / static_cast<float>(episodes_per_epoch));
@@ -195,6 +196,7 @@ class MyApp : public App
 
     int moves = 100;
     int episodes_per_epoch = 20000;
+    int initial_train = 1;
 
     std::vector<float> total_reward_per_epoch;
     std::vector<float> clean_tiles_average;

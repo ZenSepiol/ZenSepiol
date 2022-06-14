@@ -105,12 +105,7 @@ class QLearning
         CheckForNewState(new_state);
 
         // Update Q Matrix for the last action
-        float reward = new_state.GetReward(previous_state) * time_step;
-        last_reward = reward;
-        if (print)
-        {
-            IC(reward);
-        }
+        last_reward = new_state.GetReward(previous_state) * time_step;
 
         auto& actions = Q[new_state];
         float max_q_value = actions.begin()->q_value;
@@ -119,8 +114,13 @@ class QLearning
             max_q_value = std::max(max_q_value, action.q_value);
         }
 
-        float delta = learning_rate * (reward + discount_rate * max_q_value - previous_action.q_value);
+        float delta = learning_rate * (last_reward + discount_rate * max_q_value - previous_action.q_value);
         Q[previous_state].find(previous_action)->q_value += delta;
+
+        if (print)
+        {
+            IC(last_reward);
+        }
     }
 
     typename System::State GetState()

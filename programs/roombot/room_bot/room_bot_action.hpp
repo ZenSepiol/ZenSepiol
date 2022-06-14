@@ -13,9 +13,9 @@ enum class Direction
 
 struct RoomBotAction
 {
-    friend bool operator==(const RoomBotAction& e1, const RoomBotAction& e2)
+    friend bool operator==(const RoomBotAction& lhs, const RoomBotAction& rhs)
     {
-        return (e1.direction == e2.direction);
+        return (lhs.direction == rhs.direction);
     };
 
     void print() const
