@@ -4,6 +4,7 @@ incdir = include_directories('/home/zen/imgui/backends', './implot', '/home/zen/
 
 glfw_lib = subproject('glfw').get_variable('glfw_dep')
 gl = dependency('gl')
+catch_lib = subproject('catch2').get_variable('catch2_dep')
 
 app_files = files(
     'main.cpp',
@@ -19,3 +20,5 @@ app_files = files(
 )
 
 executable('app', app_files, include_directories : incdir, dependencies : [glfw_lib, gl] )
+
+subdir('limiter')
