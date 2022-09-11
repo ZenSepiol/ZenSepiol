@@ -9,6 +9,8 @@
 #include "implot.h"
 #include <cstdlib>
 #include <stdio.h>
+#include <functional>
+
 #if defined(IMGUI_IMPL_OPENGL_ES2)
 #include <GLES2/gl2.h>
 #endif
@@ -22,18 +24,20 @@
 #pragma comment(lib, "legacy_stdio_definitions")
 #endif
 
-static void glfw_error_callback(int error, const char* description)
+static void ErrorCallback(int error, const char* description)
 {
     fprintf(stderr, "Glfw Error %d: %s\n", error, description);
 }
 
+template<typename Derived>
 class AppBase
 {
   public:
     AppBase()
     {
-        // Setup window
-        glfwSetErrorCallback(glfw_error_callback);
+        // Setup Callbacks
+        glfwSetErrorCallback(ErrorCallback);
+
         if (!glfwInit())
             std::exit(1);
 
@@ -63,12 +67,15 @@ class AppBase
         // Create window with graphics context
         // GLFWmonitor* monitor = glfwGetPrimaryMonitor();
         window = glfwCreateWindow(1280, 720, "Zen Sepiol Default App", nullptr, nullptr);
-        glfwSetWindowSize(window, 1920, 1080);
-
         if (window == NULL)
             std::exit(1);
+        glfwSetWindowSize(window, 1920, 1080);
+
         glfwMakeContextCurrent(window);
         glfwSwapInterval(1); // Enable vsync
+
+        glfwSetMouseButtonCallback(window, &Derived::MouseButtonCallback);
+        glfwSetCursorPosCallback(window, &Derived::CursorPosCallback);
 
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -233,8 +240,15 @@ class AppBase
         }
     }
 
-    virtual void Update() = 0;
-    virtual void StartUp() = 0;
+    void Update()
+    { 
+        static_cast<Derived*>(this)->Update();
+    }
+
+    virtual void StartUp()
+    {
+        static_cast<Derived*>(this)->StartUp();
+    }
 
   private:
     GLFWwindow* window = nullptr;
