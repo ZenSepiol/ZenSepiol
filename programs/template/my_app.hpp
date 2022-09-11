@@ -6,7 +6,7 @@
 
 #include "app_base.hpp"
 
-template<typename T>
+template <typename T>
 void pop_front(std::vector<T>& vec)
 {
     assert(!vec.empty());
@@ -14,14 +14,13 @@ void pop_front(std::vector<T>& vec)
     vec.pop_back();
 }
 
-class MyApp : public AppBase
+class MyApp : public AppBase<MyApp>
 {
   public:
-    MyApp(){
-    };
-    ~MyApp() = default;
+    MyApp(){};
+    virtual ~MyApp() = default;
 
-    virtual void StartUp() final
+    void StartUp()
     {
         for (int i = 0; i < 50; ++i)
         {
@@ -29,7 +28,7 @@ class MyApp : public AppBase
         }
     }
 
-    virtual void Update() final
+    void Update()
     {
         ImGui::Begin("Tool");
 
@@ -41,6 +40,22 @@ class MyApp : public AppBase
 
         ImGui::End();
     };
+
+    static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+    {
+        // ONLY forward mouse data to your underlying app/game.
+        ImGuiIO& io = ImGui::GetIO();
+        if (!io.WantCaptureMouse)
+            std::cout << "Button Clicked!: " << button << std::endl;
+    }
+
+    static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+    {
+        // ONLY forward mouse data to your underlying app/game.
+        ImGuiIO& io = ImGui::GetIO();
+        if (!io.WantCaptureMouse)
+            std::cout << "Cursor moved! x: " << xpos << " y: " << ypos << std::endl;
+    }
 
   private:
     float my_color[4];
