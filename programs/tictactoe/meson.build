@@ -1,11 +1,12 @@
 project('template', 'cpp')
 
-incdir = include_directories('./Catch2/single_include/catch2', '/home/zen/imgui/backends', './implot', '/home/zen/imgui')
+incdir = include_directories('/home/zen/imgui/backends', './implot', '/home/zen/imgui')
 
 glfw_lib = subproject('glfw').get_variable('glfw_dep')
 gl = dependency('gl')
+catch_lib = subproject('catch2').get_variable('catch2_dep')
 
-files = files(
+app_files = files(
     'main.cpp',
     '/home/zen/imgui/imgui.cpp',
     '/home/zen/imgui/imgui_draw.cpp',
@@ -18,4 +19,6 @@ files = files(
     './implot/implot_items.cpp'
 )
 
-executable('template', files, include_directories : incdir, dependencies : [glfw_lib, gl] )
+executable('app', app_files, include_directories : incdir, dependencies : [glfw_lib, gl] )
+
+subdir('limiter')
