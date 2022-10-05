@@ -3,11 +3,11 @@
 
 #include "app_base.hpp"
 
-class MyApp : public AppBase<MyApp>
+class Tetris : public AppBase<Tetris>
 {
   public:
-    MyApp(){};
-    virtual ~MyApp() = default;
+    Tetris(){};
+    virtual ~Tetris() = default;
 
     void StartUp()
     {
@@ -15,25 +15,30 @@ class MyApp : public AppBase<MyApp>
 
     void Update()
     {
-        ImGui::Begin("Tool");
-
-        ImGui::End();
-    };
+    }
 
     static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     {
-        // ONLY forward mouse data to your underlying app/game.
         ImGuiIO& io = ImGui::GetIO();
         if (!io.WantCaptureMouse)
-            std::cout << "Button Clicked!: " << button << std::endl;
+        {
+        }
     }
 
     static void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
     {
-        // ONLY forward mouse data to your underlying app/game.
         ImGuiIO& io = ImGui::GetIO();
         if (!io.WantCaptureMouse)
-            std::cout << "Cursor moved! x: " << xpos << " y: " << ypos << std::endl;
+        {
+        }
+    }
+
+    static void KeyCallback(GLFWwindow* window, int key, int scancode, int actions, int mods)
+    {
+        ImGuiIO& io = ImGui::GetIO();
+        if (!io.WantCaptureKeyboard)
+        {
+        }
     }
 
   private:
