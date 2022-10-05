@@ -191,7 +191,15 @@ class AppBase
     }
 
     // Copy me!
-    // static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+    //
+    // void Update()
+    // {
+    // }
+    //
+    // virtual void StartUp()
+    // {
+    // }
+    //     static void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
     // {
     //     ImGuiIO& io = ImGui::GetIO();
     //     if (!io.WantCaptureMouse)
