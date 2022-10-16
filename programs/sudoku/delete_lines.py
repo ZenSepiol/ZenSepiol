@@ -5,7 +5,7 @@ for filename in ['sudoku_solver/sudoku_solver.hpp']:
     with open(filename) as file:
         lines = file.read().splitlines()
 
-    percentage = 0.1
+    percentage = 0.2
     k = int(len(lines) * percentage)
 
     random_lines = random.sample(lines, k)
