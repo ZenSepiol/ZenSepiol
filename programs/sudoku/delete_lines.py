@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import random
 
-for filename in ['sudoku_solver/sudoku_solver.hpp']: # , 'sudoku_solver/sudoku_solver.cpp']:
+for filename in ['sudoku_solver/sudoku_solver.hpp']:
     with open(filename) as file:
         lines = file.read().splitlines()
 
