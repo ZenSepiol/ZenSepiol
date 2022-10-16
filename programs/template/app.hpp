@@ -3,11 +3,11 @@
 
 #include "app_base.hpp"
 
-class Tetris : public AppBase<Tetris>
+class App : public AppBase<App>
 {
   public:
-    Tetris(){};
-    virtual ~Tetris() = default;
+    App(){};
+    virtual ~App() = default;
 
     void StartUp()
     {
